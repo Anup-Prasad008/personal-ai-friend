@@ -6,10 +6,10 @@
 
 body {
   height: 100vh;
-  background: radial-gradient(circle at top, #0b0f1a, #000);
+  background: #05060a;
   display: flex;
-  color: white;
   font-family: "Segoe UI", sans-serif;
+  color: #cfd3ff;
 }
 
 /* ---------- SIDEBAR ---------- */
@@ -21,60 +21,68 @@ body {
 }
 
 .status-dot {
-  width: 16px;
-  height: 16px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: gray;
-  box-shadow: 0 0 10px gray;
+  background: #444;
   transition: 0.3s;
 }
 
-.listening {
-  background: #00f2ff;
-  box-shadow: 0 0 20px #00f2ff;
+.status-dot.listening {
+  background: #00eaff;
+  box-shadow: 0 0 12px #00eaff;
 }
 
-.speaking {
-  background: #ff00e5;
-  box-shadow: 0 0 25px #ff00e5;
+.status-dot.speaking {
+  background: #ff4ecd;
+  box-shadow: 0 0 12px #ff4ecd;
 }
 
 /* ---------- CENTER ORB ---------- */
 .center {
   flex: 1;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
 .orb {
-  width: 260px;
-  height: 260px;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #00f2ff, #7f00ff);
-  animation: spin 10s linear infinite;
+  background:
+    radial-gradient(circle at 30% 30%, #1a1c2b, #05060a);
+  animation: breathe 7s ease-in-out infinite;
   box-shadow:
-    0 0 50px rgba(0,242,255,0.6),
-    0 0 120px rgba(127,0,255,0.6);
-  position: relative;
+    inset 0 0 30px rgba(0,0,0,0.8),
+    0 0 40px rgba(120,120,255,0.15);
+  margin-bottom: 20px; /* Space between orb and text box */
 }
 
-.orb::after {
-  content: "";
-  position: absolute;
-  inset: -40%;
-  background: radial-gradient(circle, rgba(255,255,255,0.25), transparent 60%);
-  animation: wave 4s ease-in-out infinite;
+@keyframes breathe {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+/* ---------- TEXT INPUT BOX ---------- */
+.text-input {
+  width: 300px;
+  padding: 10px;
+  border: 1px solid #00eaff;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #cfd3ff;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: 0.3s;
 }
 
-@keyframes wave {
-  0% { transform: translate(-20%, -20%); }
-  50% { transform: translate(20%, 20%); }
-  100% { transform: translate(-20%, -20%); }
+.text-input:focus {
+  border-color: #ff4ecd;
+  box-shadow: 0 0 10px #ff4ecd;
 }
 
 /* ---------- RIGHT PANEL ---------- */
@@ -85,15 +93,22 @@ body {
 
 .weather {
   position: absolute;
-  top: 40%;
+  top: 45%;
   right: 20px;
-  opacity: 0.8;
+  font-size: 14px;
+  opacity: 0.6;
 }
 
 .time {
   position: absolute;
   bottom: 20px;
   right: 20px;
-  font-size: 14px;
-  opacity: 0.7;
+  font-family: 'Courier New', monospace; /* Hacker-style monospace font */
+  font-size: 13px;
+  color: #00ff00; /* Green hacker color */
+  background: rgba(0, 0, 0, 0.8); /* Semi-transparent black background for terminal feel */
+  padding: 5px 10px;
+  border-radius: 3px;
+  box-shadow: 0 0 10px #00ff00; /* Green glow for professional hacker vibe */
+  opacity: 0.9; /* Slightly more visible */
 }
