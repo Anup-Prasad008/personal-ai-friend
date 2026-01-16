@@ -7,47 +7,30 @@ const OPENAI_API_KEY = "sk-proj-vcI0szi8wswufKKFCghRg3HlvuwksdyqbnJHJP0htFYKyhPV
   ELEMENTS
 ************************/
 const timeEl = document.getElementById("time");
-const avatar = document.getElementById("aiAvatar");
-const voiceLevel = document.getElementById("voiceLevel");
 const textInput = document.getElementById("textInput");
 const sendBtn = document.getElementById("sendBtn");
+const voiceBar = document.getElementById("voiceBar");
 
 /***********************
-  TIME (WITH SECONDS)
+  TIME FUNCTION
 ************************/
 function updateTime() {
   const now = new Date();
-  timeEl.textContent = now.toLocaleTimeString("en-IN", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit"
-  });
+  timeEl.textContent = now.toLocaleTimeString("en-IN", { hour12: false });
 }
 setInterval(updateTime, 1000);
 updateTime();
 
 /***********************
-  CURSOR FOLLOW (SMOOTH)
+  LOTTIE ANIMATION
 ************************/
-let mouseX = window.innerWidth / 2;
-let mouseY = window.innerHeight / 2;
-let avatarX = mouseX;
-let avatarY = mouseY;
-
-document.addEventListener("mousemove", (e) => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
+const aiAnimation = lottie.loadAnimation({
+  container: document.getElementById('aiAnimation'),
+  renderer: 'svg',
+  loop: true,
+  autoplay: true,
+  path: 'https://assets2.lottiefiles.com/packages/lf20_x62chJ.json' // Robot girl animation URL
 });
-
-function animateAvatar() {
-  avatarX += (mouseX - avatarX) * 0.05;
-  avatarY += (mouseY - avatarY) * 0.05;
-
-  avatar.style.transform = `translate(${avatarX - window.innerWidth / 2}px, ${avatarY - window.innerHeight / 2}px)`;
-
-  requestAnimationFrame(animateAvatar);
-}
-animateAvatar();
 
 /***********************
   SPEECH SYNTHESIS
@@ -55,56 +38,52 @@ animateAvatar();
 function speak(text) {
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = "hi-IN";
-
-  utter.onstart = () => {
-    voiceLevel.style.animation = "none";
-    voiceLevel.style.width = "80%";
-  };
-
-  utter.onend = () => {
-    voiceLevel.style.width = "20%";
-    voiceLevel.style.animation = "voiceIdle 1.5s ease-in-out infinite";
-  };
-
   speechSynthesis.speak(utter);
 }
 
 /***********************
-  GREETING (AUTO)
+  CREATE VOICE DOTS
 ************************/
-window.onload = () => {
-  setTimeout(() => {
-    speak("Hey dost, main ready hoon. Bolo ya likho, main sun raha hoon.");
-  }, 1200);
-};
+const DOT_COUNT = 20;
+const dots = [];
+for (let i = 0; i < DOT_COUNT; i++) {
+  const dot = document.createElement('div');
+  dot.classList.add('dot');
+  voiceBar.appendChild(dot);
+  dots.push(dot);
+}
 
 /***********************
-  SPEECH RECOGNITION
+  VOICE DOTS ANIMATION
 ************************/
-const SpeechRecognition =
-  window.SpeechRecognition || window.webkitSpeechRecognition;
+navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+  const audioCtx = new AudioContext();
+  const mic = audioCtx.createMediaStreamSource(stream);
+  const analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 128;
+  mic.connect(analyser);
+  const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-const recognition = new SpeechRecognition();
-recognition.lang = "hi-IN";
-recognition.continuous = false;
-
-document.addEventListener("click", () => {
-  recognition.start();
+  function animateDots() {
+    analyser.getByteFrequencyData(dataArray);
+    dots.forEach((dot, i) => {
+      const v = dataArray[i % dataArray.length] / 256; // 0-1
+      dot.style.transform = `scaleY(${0.3 + v})`;
+      dot.style.opacity = `${0.3 + v}`;
+    });
+    requestAnimationFrame(animateDots);
+  }
+  animateDots();
 });
 
-recognition.onresult = (e) => {
-  const text = e.results[0][0].transcript;
-  handleUserMessage(text);
-};
-
 /***********************
-  TEXT INPUT
+  SEND BUTTON
 ************************/
-sendBtn.addEventListener("click", () => {
+sendBtn.addEventListener("click", async () => {
   const text = textInput.value.trim();
   if (!text) return;
   textInput.value = "";
-  handleUserMessage(text);
+  await handleUserMessage(text);
 });
 
 /***********************
@@ -123,11 +102,7 @@ async function handleUserMessage(userText) {
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
-          {
-            role: "system",
-            content:
-              "Tu ek close dost jaisa AI hai. Friendly, simple Hindi me jawab deta hai."
-          },
+          { role: "system", content: "Tu ek close dost jaisa AI hai. Friendly, simple Hindi me jawab deta hai." },
           { role: "user", content: userText }
         ]
       })
@@ -136,30 +111,17 @@ async function handleUserMessage(userText) {
     const data = await res.json();
     const reply = data.choices[0].message.content;
     speak(reply);
-
   } catch (err) {
-    speak("Bhai thoda network ya key issue lag raha hai.");
     console.error(err);
+    speak("Bhai thoda network ya key issue lag raha hai.");
   }
 }
 
 /***********************
-  VOICE BAR (MIC REACTIVE)
+  AUTO GREETING
 ************************/
-navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-  const audioCtx = new AudioContext();
-  const mic = audioCtx.createMediaStreamSource(stream);
-  const analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 256;
-
-  mic.connect(analyser);
-  const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-  function animateVoice() {
-    analyser.getByteFrequencyData(dataArray);
-    let volume = dataArray.reduce((a, b) => a + b) / dataArray.length;
-    voiceLevel.style.width = `${Math.min(100, volume)}%`;
-    requestAnimationFrame(animateVoice);
-  }
-  animateVoice();
-});
+window.onload = () => {
+  setTimeout(() => {
+    speak("Hey dost, main ready hoon. Type karo aur baat karo!");
+  }, 1200);
+};
