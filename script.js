@@ -1,113 +1,117 @@
+/***********************
+  CONFIG
+************************/
 const OPENAI_API_KEY = "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"; // demo only
 
-const statusDot = document.getElementById("sidebar").firstElementChild;
+/***********************
+  ELEMENTS
+************************/
 const timeEl = document.getElementById("time");
-const weatherEl = document.getElementById("weather");
-const textInput = document.getElementById('textInput');
-const voiceSelect = document.getElementById('voiceSelect');
+const avatar = document.getElementById("aiAvatar");
+const voiceLevel = document.getElementById("voiceLevel");
+const textInput = document.getElementById("textInput");
+const sendBtn = document.getElementById("sendBtn");
 
-/* ---------- TIME ---------- */
+/***********************
+  TIME (WITH SECONDS)
+************************/
 function updateTime() {
   const now = new Date();
   timeEl.textContent = now.toLocaleTimeString("en-IN", {
     hour: "2-digit",
-    minute: "2-digit"
+    minute: "2-digit",
+    second: "2-digit"
   });
 }
 setInterval(updateTime, 1000);
 updateTime();
 
-/* ---------- WEATHER (Faridabad) ---------- */
-async function loadWeather() {
-  weatherEl.textContent = "Faridabad • Loading...";
-  // Static professional display (API-free for GitHub Pages)
-  weatherEl.textContent = "Faridabad • Today • Clear";
+/***********************
+  CURSOR FOLLOW (SMOOTH)
+************************/
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
+let avatarX = mouseX;
+let avatarY = mouseY;
+
+document.addEventListener("mousemove", (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
+
+function animateAvatar() {
+  avatarX += (mouseX - avatarX) * 0.05;
+  avatarY += (mouseY - avatarY) * 0.05;
+
+  avatar.style.transform = `translate(${avatarX - window.innerWidth / 2}px, ${avatarY - window.innerHeight / 2}px)`;
+
+  requestAnimationFrame(animateAvatar);
 }
-loadWeather();
+animateAvatar();
 
-/* ---------- VOICE SETUP ---------- */
-const synth = window.speechSynthesis;
-
-// Populate voice dropdown and prioritize female voices for friendly/caring tone
-function populateVoices() {
-  const voices = synth.getVoices();
-  voiceSelect.innerHTML = '';
-  let femaleVoices = [];
-  let otherVoices = [];
-
-  voices.forEach(voice => {
-    const option = document.createElement('option');
-    option.value = voice.name;
-    option.textContent = `${voice.name} (${voice.lang})`;
-
-    // Prioritize female voices (add more keywords if needed)
-    if (voice.name.toLowerCase().includes('female') || voice.name.toLowerCase().includes('girl') || 
-        voice.name.toLowerCase().includes('zira') || voice.name.toLowerCase().includes('hazel') || 
-        voice.name.toLowerCase().includes('samantha') || voice.name.toLowerCase().includes('victoria') ||
-        voice.name.toLowerCase().includes('karen') || voice.name.toLowerCase().includes('susan')) {
-      femaleVoices.push(option);
-    } else {
-      otherVoices.push(option);
-    }
-  });
-
-  // Add female voices first, then others
-  femaleVoices.forEach(opt => voiceSelect.appendChild(opt));
-  otherVoices.forEach(opt => voiceSelect.appendChild(opt));
-
-  // Auto-select the first female voice if available
-  if (femaleVoices.length > 0) {
-    voiceSelect.value = femaleVoices[0].value;
-  }
-}
-
-// Load voices
-populateVoices();
-if (speechSynthesis.onvoiceschanged !== undefined) {
-  speechSynthesis.onvoiceschanged = populateVoices;
-}
-
-// Updated speak function with voice selection and caring settings
+/***********************
+  SPEECH SYNTHESIS
+************************/
 function speak(text) {
-  if (synth.speaking) synth.cancel(); // Stop any ongoing speech
-  const utterance = new SpeechSynthesisUtterance(text);
-  const selectedVoice = voiceSelect.value;
-  const voices = synth.getVoices();
-  utterance.voice = voices.find(voice => voice.name === selectedVoice) || voices[0];
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "hi-IN";
 
-  // Friendly/caring settings: Hindi lang, slower rate, higher pitch
-  utterance.lang = "hi-IN"; // Hindi for responses
-  utterance.rate = 0.8; // Slower for caring feel
-  utterance.pitch = 1.2; // Higher pitch for friendliness
-  utterance.volume = 1; // Full volume
+  utter.onstart = () => {
+    voiceLevel.style.animation = "none";
+    voiceLevel.style.width = "80%";
+  };
 
-  // Update status dot
-  statusDot.className = "status-dot speaking";
-  utterance.onend = () => statusDot.className = "status-dot";
-  synth.speak(utterance);
+  utter.onend = () => {
+    voiceLevel.style.width = "20%";
+    voiceLevel.style.animation = "voiceIdle 1.5s ease-in-out infinite";
+  };
+
+  speechSynthesis.speak(utter);
 }
 
-/* ---------- VOICE RECOGNITION ---------- */
-const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-recognition.lang = "hi-IN";
-
-/* ---------- GREETING ---------- */
+/***********************
+  GREETING (AUTO)
+************************/
 window.onload = () => {
   setTimeout(() => {
-    speak("नमस्ते दोस्त, मैं यहीं हूँ। जब बोलना हो, मुझे कॉल करो।"); // Friendly Hindi greeting
-  }, 1000);
+    speak("Hey dost, main ready hoon. Bolo ya likho, main sun raha hoon.");
+  }, 1200);
 };
 
-/* ---------- LISTEN (Voice or Click) ---------- */
-document.body.addEventListener("click", () => {
-  statusDot.className = "status-dot listening";
+/***********************
+  SPEECH RECOGNITION
+************************/
+const SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+
+const recognition = new SpeechRecognition();
+recognition.lang = "hi-IN";
+recognition.continuous = false;
+
+document.addEventListener("click", () => {
   recognition.start();
 });
 
-// Handle voice input
-recognition.onresult = async (e) => {
-  const userText = e.results[0][0].transcript;
-  console.log("User said:", userText); // For debugging
+recognition.onresult = (e) => {
+  const text = e.results[0][0].transcript;
+  handleUserMessage(text);
+};
+
+/***********************
+  TEXT INPUT
+************************/
+sendBtn.addEventListener("click", () => {
+  const text = textInput.value.trim();
+  if (!text) return;
+  textInput.value = "";
+  handleUserMessage(text);
+});
+
+/***********************
+  AI BRAIN
+************************/
+async function handleUserMessage(userText) {
+  speak("Hmm… soch raha hoon.");
 
   try {
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -119,57 +123,43 @@ recognition.onresult = async (e) => {
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: "तू एक करींग और फ्रेंडली दोस्त जैसा AI है। जवाब हिंदी में दे और हमेशा प्यार से बात कर।" }, // Caring, friendly system prompt in Hindi
+          {
+            role: "system",
+            content:
+              "Tu ek close dost jaisa AI hai. Friendly, simple Hindi me jawab deta hai."
+          },
           { role: "user", content: userText }
         ]
       })
     });
 
     const data = await res.json();
-    const aiResponse = data.choices[0].message.content;
-    speak(aiResponse);
-  } catch (error) {
-    console.error("Error:", error);
-    speak("क्षमा करें, कुछ गड़बड़ हो गई है। फिर से कोशिश करें।"); // Error message in Hindi
+    const reply = data.choices[0].message.content;
+    speak(reply);
+
+  } catch (err) {
+    speak("Bhai thoda network ya key issue lag raha hai.");
+    console.error(err);
   }
-};
+}
 
-// Handle text input (type and press Enter)
-textInput.addEventListener('keypress', async (e) => {
-  if (e.key === 'Enter') {
-    const userText = textInput.value.trim();
-    if (userText) {
-      textInput.value = ''; // Clear input
-      console.log("User typed:", userText); // For debugging
+/***********************
+  VOICE BAR (MIC REACTIVE)
+************************/
+navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+  const audioCtx = new AudioContext();
+  const mic = audioCtx.createMediaStreamSource(stream);
+  const analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
 
-      try {
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${OPENAI_API_KEY}`
-          },
-          body: JSON.stringify({
-            model: "gpt-4o-mini",
-            messages: [
-              { role: "system", content: "तू एक करींग और फ्रेंडली दोस्त जैसा AI है। जवाब हिंदी में दे और हमेशा प्यार से बात कर।" },
-              { role: "user", content: userText }
-            ]
-          })
-        });
+  mic.connect(analyser);
+  const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-        const data = await res.json();
-        const aiResponse = data.choices[0].message.content;
-        speak(aiResponse);
-      } catch (error) {
-        console.error("Error:", error);
-        speak("क्षमा करें, कुछ गड़बड़ हो गई है। फिर से कोशिश करें।");
-      }
-    }
+  function animateVoice() {
+    analyser.getByteFrequencyData(dataArray);
+    let volume = dataArray.reduce((a, b) => a + b) / dataArray.length;
+    voiceLevel.style.width = `${Math.min(100, volume)}%`;
+    requestAnimationFrame(animateVoice);
   }
-});
-
-// Optional: Voice change listener for instant feedback
-voiceSelect.addEventListener('change', () => {
-  console.log('Voice changed to:', voiceSelect.value);
+  animateVoice();
 });
