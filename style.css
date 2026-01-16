@@ -1,35 +1,99 @@
-body {
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
   height: 100vh;
-  background: black;
+  background: radial-gradient(circle at top, #0b0f1a, #000);
+  display: flex;
+  color: white;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar {
+  width: 80px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: Arial, sans-serif;
-  color: white;
 }
 
-.assistant {
-  text-align: center;
+.status-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: gray;
+  box-shadow: 0 0 10px gray;
+  transition: 0.3s;
+}
+
+.listening {
+  background: #00f2ff;
+  box-shadow: 0 0 20px #00f2ff;
+}
+
+.speaking {
+  background: #ff00e5;
+  box-shadow: 0 0 25px #ff00e5;
+}
+
+/* ---------- CENTER ORB ---------- */
+.center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .orb {
-  width: 120px;
-  height: 120px;
+  width: 260px;
+  height: 260px;
   border-radius: 50%;
-  background: cyan;
-  animation: pulse 1.5s infinite;
-  margin-bottom: 20px;
+  background: linear-gradient(135deg, #00f2ff, #7f00ff);
+  animation: spin 10s linear infinite;
+  box-shadow:
+    0 0 50px rgba(0,242,255,0.6),
+    0 0 120px rgba(127,0,255,0.6);
+  position: relative;
 }
 
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 0.7; }
-  50% { transform: scale(1.2); opacity: 1; }
-  100% { transform: scale(1); opacity: 0.7; }
+.orb::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(circle, rgba(255,255,255,0.25), transparent 60%);
+  animation: wave 4s ease-in-out infinite;
 }
 
-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes wave {
+  0% { transform: translate(-20%, -20%); }
+  50% { transform: translate(20%, 20%); }
+  100% { transform: translate(-20%, -20%); }
+}
+
+/* ---------- RIGHT PANEL ---------- */
+.right-panel {
+  width: 220px;
+  position: relative;
+}
+
+.weather {
+  position: absolute;
+  top: 40%;
+  right: 20px;
+  opacity: 0.8;
+}
+
+.time {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  font-size: 14px;
+  opacity: 0.7;
 }
