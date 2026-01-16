@@ -2,15 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>AI Friend Assistant</title>
+  <title>AI Dost</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="assistant">
+  <!-- LEFT SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="status-dot"></div>
+  </div>
+
+  <!-- CENTER ORB -->
+  <div class="center">
     <div class="orb"></div>
-    <h2>AI Dost</h2>
-    <button onclick="startListening()">🎙️ Talk</button>
+  </div>
+
+  <!-- RIGHT INFO -->
+  <div class="right-panel">
+    <div class="weather" id="weather"></div>
+    <div class="time" id="time"></div>
   </div>
 
   <script src="script.js"></script>
