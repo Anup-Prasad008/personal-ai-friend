@@ -1,3 +1,4 @@
+/* ================= RESET AND BASE STYLES ================= */
 * {
   margin: 0;
   padding: 0;
@@ -8,9 +9,12 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  font-family: "Segoe UI", system-ui, sans-serif;
+  font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
   background: radial-gradient(circle at top, #0a0f1f, #000);
   color: #fff;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ================= STAGE ================= */
@@ -18,26 +22,47 @@ html, body {
   position: relative;
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
-/* ================= AI CHARACTER ================= */
-.ai-character {
+/* ================= BACKGROUND VIDEO ================= */
+.background-video {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+  opacity: 0.3;
+  filter: blur(1px); /* Subtle blur for depth */
+}
+
+/* ================= AI CHARACTER (VIDEO LOOP) ================= */
+.ai-character {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
   pointer-events: none;
+  z-index: 1;
+  margin-bottom: 20px;
 }
 
-#aiAvatar {
-  width: min(40vw, 420px);
+#aiLoopVideo {
+  width: clamp(200px, 40vw, 420px);
   max-width: 80vw;
-  filter:
-    drop-shadow(0 0 40px rgba(0, 255, 255, 0.35))
-    drop-shadow(0 0 80px rgba(140, 0, 255, 0.35));
-  animation: float 6s ease-in-out infinite, blink 3s infinite;
+  height: auto;
+  border-radius: 16px;
+  filter: drop-shadow(0 0 40px rgba(0, 255, 255, 0.35)) drop-shadow(0 0 80px rgba(140, 0, 255, 0.35));
+  animation: float 6s ease-in-out infinite;
   transition: transform 0.15s linear;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.1);
 }
 
 /* Floating idle animation */
@@ -47,17 +72,10 @@ html, body {
   100% { transform: translateY(0px); }
 }
 
-/* Blinking eyes */
-@keyframes blink {
-  0%, 90% { opacity: 1; }
-  95% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
 /* ================= VOICE BAR (DOTS) ================= */
 .voice-bar {
   position: absolute;
-  bottom: 110px;
+  bottom: clamp(80px, 15vh, 110px);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -65,6 +83,7 @@ html, body {
   align-items: center;
   justify-content: center;
   height: 40px;
+  z-index: 2;
 }
 
 .dot {
@@ -73,6 +92,7 @@ html, body {
   background: linear-gradient(90deg, #00f2ff, #7f00ff, #ff00e5);
   border-radius: 50%;
   animation: dotIdle 1.5s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
 }
 
 .dot:nth-child(2) { animation-delay: 0.1s; }
@@ -101,17 +121,20 @@ html, body {
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: min(90vw, 600px);
-  padding: 12px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 12px;
+  width: clamp(300px, 90vw, 600px);
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
   backdrop-filter: blur(16px);
-  box-shadow: 0 0 30px rgba(0,0,0,0.6);
-  font-size: 16px;
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.05);
+  font-size: clamp(14px, 2.5vw, 16px);
   line-height: 1.4;
   opacity: 0;
-  transition: opacity 0.5s;
+  transition: opacity 0.5s ease-in-out;
   text-align: center;
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .text-display.show {
@@ -121,17 +144,20 @@ html, body {
 /* ================= CHAT BOX ================= */
 .chat-box {
   position: absolute;
-  bottom: 40px;
+  bottom: clamp(20px, 5vh, 40px);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 12px;
-  padding: 12px 14px;
-  width: min(90vw, 520px);
-  background: rgba(255,255,255,0.08);
-  border-radius: 18px;
+  padding: 14px 16px;
+  width: clamp(300px, 90vw, 520px);
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
   backdrop-filter: blur(16px);
-  box-shadow: 0 0 30px rgba(0,0,0,0.6);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.05);
+  z-index: 2;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .chat-box input {
@@ -140,56 +166,120 @@ html, body {
   border: none;
   outline: none;
   color: #fff;
-  font-size: 16px;
+  font-size: clamp(14px, 2.5vw, 16px);
+  font-family: inherit;
 }
 
 .chat-box input::placeholder {
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .chat-box button {
   background: linear-gradient(135deg, #00f2ff, #7f00ff);
   border: none;
   padding: 10px 18px;
-  border-radius: 14px;
+  border-radius: 16px;
   color: #000;
   font-weight: 600;
   cursor: pointer;
-  transition: 0.25s;
+  transition: all 0.25s ease;
+  font-size: clamp(12px, 2vw, 14px);
+  box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
 }
 
 .chat-box button:hover {
   transform: scale(1.08);
-  box-shadow: 0 0 25px rgba(0,242,255,0.7);
+  box-shadow: 0 0 25px rgba(0, 242, 255, 0.7);
+}
+
+.chat-box button:active {
+  transform: scale(0.95);
 }
 
 /* ================= TIME ================= */
 .time-panel {
   position: absolute;
-  right: 26px;
-  bottom: 26px;
-  font-size: clamp(22px, 3vw, 34px);
+  right: clamp(10px, 2vw, 26px);
+  bottom: clamp(10px, 2vh, 26px);
+  font-size: clamp(18px, 3vw, 34px);
   font-weight: 600;
   letter-spacing: 1px;
   opacity: 0.8;
-  text-shadow: 0 0 20px rgba(0,255,255,0.35);
+  text-shadow: 0 0 20px rgba(0, 255, 255, 0.35);
+  z-index: 2;
 }
 
-/* ================= RESPONSIVE ================= */
+/* ================= RESPONSIVE ADJUSTMENTS ================= */
 @media (max-width: 768px) {
-  #aiAvatar {
+  .stage {
+    padding: 10px;
+  }
+
+  #aiLoopVideo {
     width: 65vw;
   }
 
   .voice-bar {
-    bottom: 100px;
+    bottom: clamp(70px, 12vh, 100px);
   }
 
   .chat-box {
-    bottom: 26px;
+    bottom: clamp(10px, 3vh, 26px);
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .chat-box input {
+    width: 100%;
   }
 
   .text-display {
     width: 95vw;
+    top: 10px;
   }
 }
+
+@media (max-width: 480px) {
+  #aiLoopVideo {
+    width: 75vw;
+  }
+
+  .voice-bar {
+    bottom: clamp(60px, 10vh, 90px);
+  }
+
+  .text-display {
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  .chat-box {
+    padding: 12px;
+  }
+
+  .time-panel {
+    font-size: 20px;
+    right: 10px;
+    bottom: 10px;
+  }
+}
+
+/* ================= ACCESSIBILITY AND SMOOTHNESS ================= */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus styles for better accessibility */
+.chat-box input:focus {
+  outline: 2px solid #00f2ff;
+  outline-offset: 2px;
+}
+
+.chat-box button:focus {
+  outline: 2px solid #00f2ff;
+  outline-offset: 2px;
+                                    }
