@@ -4,241 +4,193 @@
   ************************/
   const OPENAI_API_KEY = "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"; // Demo only - In production, secure this server-side
 
-  /***********************
-    ELEMENTS
-  ************************/
-  const timeEl = document.getElementById("time");
-  const avatar = document.getElementById("aiLoopVideo");
-  const voiceBar = document.querySelector(".voice-bar");
-  const textDisplay = document.getElementById("textDisplay");
-  const textInput = document.getElementById("textInput");
-  const sendBtn = document.getElementById("sendBtn");
+/*********************************
+ ELEMENTS
+**********************************/
+const timeEl = document.getElementById("time");
+const avatar = document.getElementById("aiLoopVideo");
+const voiceBar = document.querySelector(".voice-bar");
+const dots = document.querySelectorAll(".dot");
+const textDisplay = document.getElementById("textDisplay");
+const textInput = document.getElementById("textInput");
+const sendBtn = document.getElementById("sendBtn");
 
-  /***********************
-    TIME UPDATE (WITH SECONDS) - SMOOTH AND ACCURATE
-  ************************/
-  function updateTime() {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    timeEl.textContent = `${hours}:${minutes}:${seconds}`;
-  }
-  setInterval(updateTime, 1000);
-  updateTime();
+/*********************************
+ LIVE CLOCK
+**********************************/
+function updateTime() {
+  const now = new Date();
+  timeEl.textContent = now.toLocaleTimeString();
+}
+setInterval(updateTime, 1000);
+updateTime();
 
-  /***********************
-    CURSOR FOLLOW (SMOOTH ANIMATION FOR AVATAR)
-  ************************/
-  let mouseX = window.innerWidth / 2;
-  let mouseY = window.innerHeight / 2;
-  let avatarX = mouseX;
-  let avatarY = mouseY;
+/*********************************
+ SMOOTH CURSOR FOLLOW (AVATAR)
+**********************************/
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
+let currentX = mouseX;
+let currentY = mouseY;
 
-  document.addEventListener("mousemove", (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  });
+document.addEventListener("mousemove", e => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
 
-  function animateAvatar() {
-    avatarX += (mouseX - avatarX) * 0.05; // Smooth easing
-    avatarY += (mouseY - avatarY) * 0.05;
+function animateAvatar() {
+  currentX += (mouseX - currentX) * 0.04;
+  currentY += (mouseY - currentY) * 0.04;
 
-    avatar.style.transform = `translate(${avatarX - window.innerWidth / 2}px, ${avatarY - window.innerHeight / 2}px)`;
+  avatar.style.transform = `
+    translate(${currentX - window.innerWidth / 2}px,
+              ${currentY - window.innerHeight / 2}px)
+  `;
 
-    requestAnimationFrame(animateAvatar);
-  }
-  animateAvatar();
+  requestAnimationFrame(animateAvatar);
+}
+animateAvatar();
 
-  /***********************
-    SPEECH SYNTHESIS (ENGLISH VOICE FOR PROFESSIONAL TONE)
-  ************************/
-  function speak(text) {
-    if ('speechSynthesis' in window) {
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = "en-US"; // English US for clear, professional voice
-      utter.rate = 1; // Normal speed
-      utter.pitch = 1; // Normal pitch
-      utter.volume = 1; // Full volume
+/*********************************
+ SPEECH SYNTHESIS
+**********************************/
+function speak(text) {
+  if (!window.speechSynthesis) return;
 
-      utter.onstart = () => {
-        voiceBar.classList.add("speaking");
-      };
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "en-US";
+  utter.rate = 1;
+  utter.pitch = 1;
 
-      utter.onend = () => {
-        voiceBar.classList.remove("speaking");
-      };
+  utter.onstart = () => voiceBar.classList.add("speaking");
+  utter.onend = () => voiceBar.classList.remove("speaking");
 
-      speechSynthesis.speak(utter);
-    } else {
-      console.warn("Speech synthesis not supported.");
-    }
-  }
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utter);
+}
 
-  /***********************
-    DISPLAY TEXT (FOR TEXT INPUT RESPONSES)
-  ************************/
-  function displayText(text) {
-    textDisplay.textContent = text;
-    textDisplay.classList.add("show");
-    setTimeout(() => {
-      textDisplay.classList.remove("show");
-    }, 5000); // Auto-hide after 5 seconds
-  }
+/*********************************
+ TEXT DISPLAY
+**********************************/
+function showText(text) {
+  textDisplay.textContent = text;
+  textDisplay.classList.add("show");
 
-  /***********************
-    AUTO GREETING ON LOAD
-  ************************/
-  window.addEventListener("load", () => {
-    setTimeout(() => {
-      speak("Hey friend, I'm ready. Say or type, I'm listening.");
-    }, 1200);
-  });
+  setTimeout(() => {
+    textDisplay.classList.remove("show");
+  }, 5000);
+}
 
-  /***********************
-    SPEECH RECOGNITION (ALWAYS ACTIVE, CONTINUOUS)
-  ************************/
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+/*********************************
+ GREETING
+**********************************/
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    speak("Hey! I'm Bunny. You can speak or type. I'm listening.");
+  }, 1200);
+});
 
-  if (SpeechRecognition) {
-    const recognition = new SpeechRecognition();
-    recognition.lang = "en-US"; // Match voice language
-    recognition.continuous = true; // Keep listening
-    recognition.interimResults = false; // Only final results
-    recognition.maxAlternatives = 1;
+/*********************************
+ SPEECH RECOGNITION (CONTINUOUS)
+**********************************/
+const SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    recognition.start();
+if (SpeechRecognition) {
+  const recognition = new SpeechRecognition();
+  recognition.lang = "en-US";
+  recognition.continuous = true;
 
-    recognition.onresult = (event) => {
-      const transcript = event.results[event.results.length - 1][0].transcript;
-      handleUserMessage(transcript, false); // false indicates voice input
-    };
+  recognition.start();
 
-    recognition.onend = () => {
-      recognition.start(); // Restart to keep always active
-    };
+  recognition.onresult = e => {
+    const text = e.results[e.results.length - 1][0].transcript;
+    handleUserMessage(text, false);
+  };
 
-    recognition.onerror = (event) => {
-      console.error("Speech recognition error:", event.error);
-      // Optionally, restart or notify user
-    };
-  } else {
-    console.warn("Speech recognition not supported in this browser.");
-  }
+  recognition.onend = () => recognition.start();
+}
 
-  /***********************
-    TEXT INPUT HANDLING
-  ************************/
-  sendBtn.addEventListener("click", () => {
-    const text = textInput.value.trim();
-    if (!text) return;
-    textInput.value = "";
-    handleUserMessage(text, true); // true indicates text input
-  });
+/*********************************
+ TEXT INPUT
+**********************************/
+sendBtn.addEventListener("click", sendText);
+textInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") sendText();
+});
 
-  // Allow Enter key to send
-  textInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      sendBtn.click();
-    }
-  });
+function sendText() {
+  const text = textInput.value.trim();
+  if (!text) return;
+  textInput.value = "";
+  handleUserMessage(text, true);
+}
 
-  /***********************
-    AI INTERACTION (OPENAI API)
-  ************************/
-  async function handleUserMessage(userText, isTextInput) {
-    // Initial feedback
-    if (!isTextInput) {
-      speak("Hmm… thinking.");
-    } else {
-      displayText("Hmm… thinking.");
-    }
+/*********************************
+ OPENAI CHAT
+**********************************/
+async function handleUserMessage(userText, isText) {
+  isText ? showText("Thinking…") : speak("Thinking");
 
-    try {
-      const response = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            {
-              role: "system",
-              content: "You are a close friend-like AI. Respond in friendly, simple English. Keep responses concise and engaging."
-            },
-            { role: "user", content: userText }
-          ],
-          max_tokens: 150, // Limit response length for efficiency
-          temperature: 0.7 // Balanced creativity
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const reply = data.choices[0].message.content;
-
-      // Respond based on input type
-      if (isTextInput) {
-        displayText(reply);
-      } else {
-        speak(reply);
-      }
-
-    } catch (error) {
-      const errorMsg = "Sorry, there was an issue connecting. Please try again.";
-      if (isTextInput) {
-        displayText(errorMsg);
-      } else {
-        speak(errorMsg);
-      }
-      console.error("Error in AI interaction:", error);
-    }
-  }
-
-  /***********************
-    VOICE BAR (MIC REACTIVE DOTS - ENHANCED)
-  ************************/
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(stream => {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const analyser = audioContext.createAnalyser();
-        analyser.fftSize = 256;
-        const microphone = audioContext.createMediaStreamSource(stream);
-        microphone.connect(analyser);
-
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-        function animateVoiceDots() {
-          analyser.getByteFrequencyData(dataArray);
-          const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-          const scale = Math.min(2, 1 + average / 50); // Scale based on volume
-
-          document.querySelectorAll('.dot').forEach(dot => {
-            dot.style.transform = `scale(${scale})`;
-          });
-
-          requestAnimationFrame(animateVoiceDots);
-        }
-        animateVoiceDots();
+  try {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are Bunny, a friendly AI companion. Keep replies short, warm, and human-like."
+          },
+          { role: "user", content: userText }
+        ],
+        temperature: 0.7,
+        max_tokens: 180
       })
-      .catch(err => {
-        console.log("Microphone access denied or not available:", err);
-      });
-  } else {
-    console.warn("getUserMedia not supported.");
-  }
+    });
 
-  /***********************
-    ADDITIONAL RESPONSIVE HANDLING (IF NEEDED)
-  ************************/
-  // Window resize handling for dynamic adjustments (though CSS handles most)
-  window.addEventListener("resize", () => {
-    // Recalculate positions if necessary, but CSS clamp() handles scaling
+    const data = await res.json();
+    const reply = data.choices[0].message.content;
+
+    isText ? showText(reply) : speak(reply);
+
+  } catch (err) {
+    const msg = "Connection issue. Please try again.";
+    isText ? showText(msg) : speak(msg);
+    console.error(err);
+  }
+}
+
+/*********************************
+ MIC REACTIVE DOTS
+**********************************/
+if (navigator.mediaDevices?.getUserMedia) {
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    const audioCtx = new AudioContext();
+    const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+
+    const mic = audioCtx.createMediaStreamSource(stream);
+    mic.connect(analyser);
+
+    const data = new Uint8Array(analyser.frequencyBinCount);
+
+    function animateDots() {
+      analyser.getByteFrequencyData(data);
+      const avg = data.reduce((a, b) => a + b) / data.length;
+      const scale = Math.min(2, 1 + avg / 60);
+
+      dots.forEach(dot => {
+        dot.style.transform = `scale(${scale})`;
+      });
+
+      requestAnimationFrame(animateDots);
+    }
+    animateDots();
   });
-</script>
+}
