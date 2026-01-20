@@ -134,6 +134,44 @@
     <button onclick="sendMessage()">Send</button>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const chatLog = document.getElementById('chatLog');
+    const userInput = document.getElementById('userInput');
+
+    function addMessage(sender, text, className) {
+      const msg = document.createElement('div');
+      msg.className = `msg ${className}`;
+      msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
+      chatLog.appendChild(msg);
+      chatLog.scrollTop = chatLog.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const message = userInput.value.trim();
+      if (!message) return;
+
+      addMessage('You', message, 'user');
+      userInput.value = '';
+
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: message })
+        });
+        const data = await response.json();
+        addMessage('Bunny', data.response, 'bunny');
+      } catch (error) {
+        addMessage('Bunny', 'Sorry, something went wrong!', 'bunny');
+      }
+    }
+
+    userInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    // Initial greeting
+    addMessage('Bunny', "Hey! I'm Bunny - your AI Assistant. Type something to chat!", 'bunny');
+  </script>
 </body>
 </html>
