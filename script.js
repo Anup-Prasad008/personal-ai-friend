@@ -127,30 +127,20 @@ function sendText() {
 }
 
 /*********************************
- OPENAI CHAT
+ OPENAI CHAT (through backend)
 **********************************/
 async function handleUserMessage(userText, isText) {
   isText ? showText("Thinking…") : speak("Thinking");
 
   try {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    const res = await fetch("http://localhost:3000/chat", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENAI_API_KEY}`
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
         messages: [
-          {
-            role: "system",
-            content:
-              "You are Bunny, a friendly AI companion. Keep replies short, warm, and human-like."
-          },
+          { role: "system", content: "You are Bunny, a friendly AI companion. Keep replies short, warm, and human-like." },
           { role: "user", content: userText }
-        ],
-        temperature: 0.7,
-        max_tokens: 180
+        ]
       })
     });
 
