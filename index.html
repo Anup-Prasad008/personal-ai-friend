@@ -1,467 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>AI Dost</title>
+  <meta charset="UTF-8">
+  <title>Bunny AI 🐰</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
     }
 
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      font-family: "Segoe UI", system-ui, sans-serif;
-      background: radial-gradient(circle at top, #0a0f1f, #000);
-      color: #fff;
-    }
-
-    /* ================= STAGE ================= */
-    .stage {
-      position: relative;
-      width: 100%;
-      height: 100%;
+    body {
+      background: radial-gradient(circle at top, #141b2d, #080b14);
+      height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      color: #fff;
+      overflow: hidden;
     }
 
-    /* Infinite loop background video for future tech theme */
-    .background-video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -1;
-      opacity: 0.3; /* Subtle overlay */
-    }
-
-    /* ================= AI CHARACTER (NOW VIDEO LOOP) ================= */
-    .ai-character {
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    #aiLoopVideo {
-      width: min(40vw, 420px);
-      max-width: 80vw;
-      height: auto;
-      border-radius: 12px;
-      filter: drop-shadow(0 0 40px rgba(0, 255, 255, 0.35)) drop-shadow(0 0 80px rgba(140, 0, 255, 0.35));
-      animation: float 6s ease-in-out infinite;
-      transition: transform 0.15s linear;
-    }
-
-    /* Floating idle animation */
-    @keyframes float {
-      0%   { transform: translateY(0px); }
-      50%  { transform: translateY(-18px); }
-      100% { transform: translateY(0px); }
-    }
-
-    /* ================= VOICE BAR (DOTS) ================= */
-    .voice-bar {
-      position: absolute;
-      bottom: 110px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      justify-content: center;
-      height: 40px;
-      z-index: 2;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      background: linear-gradient(90deg, #00f2ff, #7f00ff, #ff00e5);
-      border-radius: 50%;
-      animation: dotIdle 1.5s ease-in-out infinite;
-    }
-
-    .dot:nth-child(2) { animation-delay: 0.1s; }
-    .dot:nth-child(3) { animation-delay: 0.2s; }
-    .dot:nth-child(4) { animation-delay: 0.3s; }
-    .dot:nth-child(5) { animation-delay: 0.4s; }
-
-    @keyframes dotIdle {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.5); }
-    }
-
-    /* Active speaking animation */
-    .voice-bar.speaking .dot {
-      animation: dotSpeak 0.5s ease-in-out infinite;
-    }
-
-    @keyframes dotSpeak {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(2); }
-    }
-
-    /* ================= TEXT DISPLAY ================= */
-    .text-display {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: min(90vw, 600px);
-      padding: 12px;
-      background: rgba(255,255,255,0.08);
-      border-radius: 12px;
-      backdrop-filter: blur(16px);
-      box-shadow: 0 0 30px rgba(0,0,0,0.6);
-      font-size: 16px;
-      line-height: 1.4;
-      opacity: 0;
-      transition: opacity 0.5s;
-      text-align: center;
-      z-index: 2;
-    }
-
-    .text-display.show {
-      opacity: 1;
-    }
-
-    /* ================= CHAT BOX ================= */
-    .chat-box {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 12px;
-      padding: 12px 14px;
-      width: min(90vw, 520px);
-      background: rgba(255,255,255,0.08);
-      border-radius: 18px;
-      backdrop-filter: blur(16px);
-      box-shadow: 0 0 30px rgba(0,0,0,0.6);
-      z-index: 2;
-    }
-
-    .chat-box input {
+    /* ===== CENTER ANIMATION ===== */
+    .center-area {
       flex: 1;
-      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .orbit {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      border: 2px dashed rgba(255, 208, 0, 0.3);
+      animation: rotate 6s linear infinite;
+      position: absolute;
+    }
+
+    .bunny-core {
+      width: 90px;
+      height: 90px;
+      background: #ffd000;
+      border-radius: 50%;
+      box-shadow: 0 0 40px #ffd000;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.12); }
+    }
+
+    /* ===== CHAT AREA ===== */
+    .chat-area {
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding: 12px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-area input {
+      flex: 1;
+      padding: 14px;
+      border-radius: 10px;
       border: none;
       outline: none;
-      color: #fff;
-      font-size: 16px;
+      font-size: 15px;
     }
 
-    .chat-box input::placeholder {
-      color: rgba(255,255,255,0.5);
-    }
-
-    .chat-box button {
-      background: linear-gradient(135deg, #00f2ff, #7f00ff);
+    .chat-area button {
+      padding: 14px 22px;
+      border-radius: 10px;
       border: none;
-      padding: 10px 18px;
-      border-radius: 14px;
+      background: #ffd000;
       color: #000;
       font-weight: 600;
       cursor: pointer;
-      transition: 0.25s;
+      transition: 0.3s;
     }
 
-    .chat-box button:hover {
-      transform: scale(1.08);
-      box-shadow: 0 0 25px rgba(0,242,255,0.7);
+    .chat-area button:hover {
+      background: #ffea70;
     }
 
-    /* ================= TIME ================= */
-    .time-panel {
+    /* ===== CHAT LOG ===== */
+    .chat-log {
       position: absolute;
-      right: 26px;
-      bottom: 26px;
-      font-size: clamp(22px, 3vw, 34px);
-      font-weight: 600;
-      letter-spacing: 1px;
-      opacity: 0.8;
-      text-shadow: 0 0 20px rgba(0,255,255,0.35);
-      z-index: 2;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 92%;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 10px;
     }
 
-    /* ================= RESPONSIVE ================= */
-    @media (max-width: 768px) {
-      #aiLoopVideo {
-        width: 65vw;
-      }
-
-      .voice-bar {
-        bottom: 100px;
-      }
-
-      .chat-box {
-        bottom: 26px;
-      }
-
-      .text-display {
-        width: 95vw;
-      }
+    .msg {
+      margin-bottom: 8px;
+      font-size: 14px;
     }
+
+    .user { color: #ffd000; }
+    .bunny { color: #7dd3ff; }
   </style>
 </head>
 <body>
 
-  <!-- FULL SCREEN STAGE -->
-  <div class="stage">
-    <!-- Infinite loop background video (future tech theme) -->
-    <video class="background-video" autoplay loop muted>
-      <source src="https://youtu.be/Hgg7M3kSqyE?si=IkjwQrxsZFqFc1fp" type="video/mp4">
-      <!-- Fallback: Replace with a real URL for a looping future tech video, e.g., from YouTube or a stock site. For demo, using a placeholder. -->
-    </video>
+  <!-- CHAT LOG -->
+  <div class="chat-log" id="chatLog"></div>
 
-    <!-- AI CHARACTER (NOW FUTURE TECH HACKER-LEVEL LOOP VIDEO) -->
-    <div class="ai-character" id="aiCharacter">
-      <!-- Infinite loop video: Future technology based, professional/hacker level -->
-      <video id="aiLoopVideo" autoplay loop muted>
-        <source src="https://example.com/hacker-future-tech-loop.mp4" type="video/mp4">
-        <!-- Replace with a real URL for a looping hacker/future tech video. 
-             Suggestions: Search for "matrix code rain loop" or "cyberpunk hacker animation loop" on free sites like Pexels, Pixabay, or YouTube (use embed if needed, but direct MP4 preferred).
-             Example placeholder: A video showing green matrix code falling, or futuristic digital interfaces. -->
-      </video>
-    </div>
-
-    <!-- VOICE BAR (DOTS) -->
-    <div class="voice-bar">
-      <div class="dot" id="dot1"></div>
-      <div class="dot" id="dot2"></div>
-      <div class="dot" id="dot3"></div>
-      <div class="dot" id="dot4"></div>
-      <div class="dot" id="dot5"></div>
-    </div>
-
-    <!-- TEXT DISPLAY (for text responses) -->
-    <div class="text-display" id="textDisplay"></div>
-
-    <!-- TEXT INPUT -->
-    <div class="chat-box">
-      <input 
-        type="text" 
-        id="textInput"
-        placeholder="Type and talk to your AI friend..."
-      />
-      <button id="sendBtn">Send</button>
-    </div>
-
-    <!-- TIME -->
-    <div class="time-panel" id="time">
-      00:00:00
-    </div>
-
+  <!-- CENTER ANIMATION -->
+  <div class="center-area">
+    <div class="orbit"></div>
+    <div class="bunny-core"></div>
   </div>
 
-  <script>
-    /***********************
-      CONFIG
-    ************************/
-    const OPENAI_API_KEY = "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"; // demo only
+  <!-- INPUT -->
+  <div class="chat-area">
+    <input type="text" id="userInput" placeholder="Bunny se kuch bolo..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
 
-    /***********************
-      ELEMENTS
-    ************************/
-    const timeEl = document.getElementById("time");
-    const avatar = document.getElementById("aiLoopVideo"); // Updated to video element
-    const voiceBar = document.querySelector(".voice-bar");
-    const textDisplay = document.getElementById("textDisplay");
-    const textInput = document.getElementById("textInput");
-    const sendBtn = document.getElementById("sendBtn");
-
-    /***********************
-      TIME (WITH SECONDS) - FIXED
-    ************************/
-    function updateTime() {
-      const now = new Date();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const seconds = String(now.getSeconds()).padStart(2, '0');
-      timeEl.textContent = `${hours}:${minutes}:${seconds}`;
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
-
-    /***********************
-      CURSOR FOLLOW (SMOOTH) - ADJUSTED FOR VIDEO
-    ************************/
-    let mouseX = window.innerWidth / 2;
-    let mouseY = window.innerHeight / 2;
-    let avatarX = mouseX;
-    let avatarY = mouseY;
-
-    document.addEventListener("mousemove", (e) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    });
-
-    function animateAvatar() {
-      avatarX += (mouseX - avatarX) * 0.05;
-      avatarY += (mouseY - avatarY) * 0.05;
-
-      avatar.style.transform = `translate(${avatarX - window.innerWidth / 2}px, ${avatarY - window.innerHeight / 2}px)`;
-
-      requestAnimationFrame(animateAvatar);
-    }
-    animateAvatar();
-
-    /***********************
-      SPEECH SYNTHESIS (VOICE CHANGED TO EN-US FOR VARIETY, BUT CAN BE ADJUSTED)
-    ************************/
-    function speak(text) {
-      const utter = new SpeechSynthesisUtterance(text);
-      utter.lang = "hi-IN"; // Changed voice to English US for a different tone; adjust as needed (e.g., keep "hi-IN" for Hindi)
-
-      utter.onstart = () => {
-        voiceBar.classList.add("speaking");
-      };
-
-      utter.onend = () => {
-        voiceBar.classList.remove("speaking");
-      };
-
-      speechSynthesis.speak(utter);
-    }
-
-    /***********************
-      DISPLAY TEXT
-    ************************/
-    function displayText(text) {
-      textDisplay.textContent = text;
-      textDisplay.classList.add("show");
-      setTimeout(() => {
-        textDisplay.classList.remove("show");
-      }, 5000); // Hide after 5 seconds
-    }
-
-    /***********************
-      GREETING (AUTO)
-    ************************/
-    window.onload = () => {
-      setTimeout(() => {
-        speak("Hey friend, I'm ready. Say or type, I'm listening.");
-      }, 1200);
-    };
-
-    /***********************
-      SPEECH RECOGNITION (ALWAYS ACTIVE)
-    ************************/
-    const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.lang = "hi-IN"; // Changed to match voice; adjust to "hi-IN" if needed
-      recognition.continuous = true;
-      recognition.interimResults = false;
-
-      recognition.start();
-
-      recognition.onresult = (e) => {
-        const text = e.results[e.results.length - 1][0].transcript;
-        handleUserMessage(text, false); // false for voice
-      };
-
-      recognition.onend = () => {
-        recognition.start(); // Restart to keep it always active
-      };
-    }
-
-    /***********************
-      TEXT INPUT
-    ************************/
-    sendBtn.addEventListener("click", () => {
-      const text = textInput.value.trim();
-      if (!text) return;
-      textInput.value = "";
-      handleUserMessage(text, true); // true for text
-    });
-
-    /***********************
-      AI BRAIN
-    ************************/
-    async function handleUserMessage(userText, isTextInput) {
-      if (!isTextInput) {
-        speak("Hmm… thinking.");
-      } else {
-        displayText("Hmm… thinking.");
-      }
-
-      try {
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${OPENAI_API_KEY}`
-          },
-          body: JSON.stringify({
-            model: "gpt-4o-mini",
-            messages: [
-              {
-                role: "system",
-                content:
-                  "You are a close friend-like AI. Respond in friendly, simple English." // Changed to English to match voice change
-              },
-              { role: "user", content: userText }
-            ]
-          })
-        });
-
-        const data = await res.json();
-        const reply = data.choices[0].message.content;
-
-        if (isTextInput) {
-          displayText(reply);
-        } else {
-          speak(reply);
-        }
-
-      } catch (err) {
-        const errorMsg = "There seems to be a network or key issue.";
-        if (isTextInput) {
-          displayText(errorMsg);
-        } else {
-          speak(errorMsg);
-        }
-        console.error(err);
-      }
-    }
-
-    /***********************
-      VOICE BAR (MIC REACTIVE DOTS)
-    ************************/
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-      const audioCtx = new AudioContext();
-      const mic = audioCtx.createMediaStreamSource(stream);
-      const analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
-
-      mic.connect(analyser);
-      const dataArray = new Uint8Array(analyser.frequencyBinCount);
-
-      function animateVoice() {
-        analyser.getByteFrequencyData(dataArray);
-        let volume = dataArray.reduce((a, b) => a + b) / dataArray.length;
-        const scale = Math.min(2, 1 + volume / 50); // Scale based on volume
-        document.querySelectorAll('.dot').forEach(dot => {
-          dot.style.transform = `scale(${scale})`;
-        });
-        requestAnimationFrame(animateVoice);
-      }
-      animateVoice();
-    }).catch(err => console.log('Microphone access denied'));
-  </script>
+  <script src="script.js"></script>
 </body>
-      </html>
+</html>
