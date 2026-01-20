@@ -1,7 +1,7 @@
 /***********************
     CONFIG
   ************************/
-  const OPENAI_API_KEY = "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"; // Demo only - In production, secure this server-side
+  const OPENAI_API_KEY = "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"; // Demo only - In production, secure this server-side
 
 /*********************************
  ELEMENTS
