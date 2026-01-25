@@ -1,177 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Bunny AI 🐰</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-
-    body {
-      background: radial-gradient(circle at top, #141b2d, #080b14);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      color: #fff;
-      overflow: hidden;
-    }
-
-    /* ===== CENTER ANIMATION ===== */
-    .center-area {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-    }
-
-    .orbit {
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      border: 2px dashed rgba(255, 208, 0, 0.3);
-      animation: rotate 6s linear infinite;
-      position: absolute;
-    }
-
-    .bunny-core {
-      width: 90px;
-      height: 90px;
-      background: #ffd000;
-      border-radius: 50%;
-      box-shadow: 0 0 40px #ffd000;
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes rotate {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.12); }
-    }
-
-    /* ===== CHAT AREA ===== */
-    .chat-area {
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(12px);
-      border-top: 1px solid rgba(255,255,255,0.1);
-      padding: 12px;
-      display: flex;
-      gap: 10px;
-    }
-
-    .chat-area input {
-      flex: 1;
-      padding: 14px;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      font-size: 15px;
-    }
-
-    .chat-area button {
-      padding: 14px 22px;
-      border-radius: 10px;
-      border: none;
-      background: #ffd000;
-      color: #000;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .chat-area button:hover {
-      background: #ffea70;
-    }
-
-    /* ===== CHAT LOG ===== */
-    .chat-log {
-      position: absolute;
-      bottom: 70px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 92%;
-      max-height: 200px;
-      overflow-y: auto;
-      padding: 10px;
-    }
-
-    .msg {
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-
-    .user { color: #ffd000; }
-    .bunny { color: #7dd3ff; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="PrintEase offers self-service printing machines for high-quality printing, copying, and scanning services. Affordable and convenient for all your document needs.">
+    <meta name="keywords" content="self-service printing, printing machines, copy services, scanning, affordable printing">
+    <meta name="author" content="PrintEase Team">
+    <title>PrintEase - Self-Service Printing Machines</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon"> <!-- Add your favicon -->
 </head>
 <body>
+    <header>
+        <div class="container">
+            <div id="branding">
+                <h1><span class="highlight">PrintEase</span> Printing</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li class="current"><a href="#hero">Home</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-  <!-- CHAT LOG -->
-  <div class="chat-log" id="chatLog"></div>
+    <section id="hero">
+        <div class="container">
+            <h1>Welcome to PrintEase</h1>
+            <p>Your go-to self-service printing machines for all your document needs.</p>
+            <a href="#services" class="btn">Explore Services</a> <!-- Added call-to-action button -->
+        </div>
+    </section>
 
-  <!-- CENTER ANIMATION -->
-  <div class="center-area">
-    <div class="orbit"></div>
-    <div class="bunny-core"></div>
-  </div>
+    <section id="services">
+        <div class="container">
+            <h2>Our Services</h2>
+            <div class="service">
+                <h3>Printing</h3>
+                <p>High-quality color and black & white printing services available 24/7.</p>
+            </div>
+            <div class="service">
+                <h3>Copying</h3>
+                <p>Fast and reliable copying for documents, photos, and more.</p>
+            </div>
+            <div class="service">
+                <h3>Scanning</h3>
+                <p>Scan documents to digital formats with ease.</p>
+            </div>
+        </div>
+    </section>
 
-  <!-- INPUT -->
-  <div class="chat-area">
-    <input type="text" id="userInput" placeholder="Bunny se kuch bolo..." />
-    <button onclick="sendMessage()">Send</button>
-  </div>
+    <section id="pricing">
+        <div class="container">
+            <h2>Pricing Plans</h2>
+            <div class="price-plan">
+                <h3>Basic</h3>
+                <p>$0.10 per page (B&W)</p>
+                <p>$0.50 per page (Color)</p>
+            </div>
+            <div class="price-plan">
+                <h3>Premium</h3>
+                <p>$0.08 per page (B&W)</p>
+                <p>$0.40 per page (Color)</p>
+                <p>Unlimited scans</p>
+            </div>
+            <div class="price-plan">
+                <h3>Business</h3>
+                <p>Custom pricing for bulk orders. Contact us for details.</p>
+            </div>
+        </div>
+    </section>
 
-  <script>
-    const chatLog = document.getElementById('chatLog');
-    const userInput = document.getElementById('userInput');
+    <section id="contact">
+        <div class="container">
+            <h2>Contact Us</h2>
+            <form id="contactForm">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" placeholder="Your Name" required aria-required="true">
+                
+                <label for="email">Your Email</label>
+                <input type="email" id="email" placeholder="Your Email" required aria-required="true">
+                
+                <label for="message">Your Message</label>
+                <textarea id="message" placeholder="Your Message" rows="5" required aria-required="true"></textarea>
+                
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+    </section>
 
-    function addMessage(sender, text, className) {
-      const msg = document.createElement('div');
-      msg.className = `msg ${className}`;
-      msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
-      chatLog.appendChild(msg);
-      chatLog.scrollTop = chatLog.scrollHeight;
-    }
+    <footer>
+        <div class="container">
+            <p>PrintEase Printing Machines &copy; 2023. All rights reserved.</p>
+            <p><a href="mailto:info@printease.com">info@printease.com</a> | Phone: (123) 456-7890</p>
+            <div class="social-media">
+                <!-- Add social media links if needed -->
+                <a href="#" aria-label="Facebook">FB</a>
+                <a href="#" aria-label="Twitter">TW</a>
+            </div>
+        </div>
+    </footer>
 
-    async function sendMessage() {
-      const message = userInput.value.trim();
-      if (!message) return;
-
-      addMessage('You', message, 'user');
-      userInput.value = '';
-
-      try {
-        const response = await fetch('/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: message })
-        });
-        const data = await response.json();
-        addMessage('Bunny', data.response, 'bunny');
-      } catch (error) {
-        addMessage('Bunny', 'Sorry, something went wrong!', 'bunny');
-      }
-    }
-
-    userInput.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') sendMessage();
-    });
-
-    // Initial greeting
-    addMessage('Bunny', "Hey! I'm Bunny - your AI Assistant. Type something to chat!", 'bunny');
-  </script>
+    <script src="script.js"></script>
 </body>
 </html>
